@@ -21,7 +21,7 @@ class Homepage extends StatelessWidget {
               final user = FirebaseAuth.instance.currentUser;
               if (user != null) {
                 if(user.emailVerified) {
-                  return const notesView();
+                  return const NotesView();
                 }
                 else{
                   return const VerifyEmailView();
@@ -45,26 +45,28 @@ class Homepage extends StatelessWidget {
   }
 }
 enum Menuaction {logout}
-class notesView extends StatefulWidget {
-  const notesView({super.key});
+class NotesView extends StatefulWidget {
+  const NotesView({super.key});
 
   @override
-  State<notesView> createState() => _notesViewState();
+  State<NotesView> createState() => _NotesViewState();
 }
 
-class _notesViewState extends State<notesView> {
+class _NotesViewState extends State<NotesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Notes'),
+      backgroundColor: Colors.blue,
       actions:  [
         PopupMenuButton<Menuaction>(
           onSelected: (value) async {
             switch (value){
               case Menuaction.logout:
-                final ShouldOut = await ShowlogOutDialog(context);
-                if(ShouldOut){
+                final shouldOut = await showlogOutDialog(context);
+                if(shouldOut){
                 await FirebaseAuth.instance.signOut();
+                // ignore: use_build_context_synchronously
                 Navigator.of(context).pushNamedAndRemoveUntil(loginRoute, (_)=>false,);
                 }
               default:
@@ -83,7 +85,7 @@ class _notesViewState extends State<notesView> {
     );
   }
 }
-Future<bool>ShowlogOutDialog(BuildContext context){
+Future<bool>showlogOutDialog(BuildContext context){
   return showDialog<bool>(context: context, builder: (context){
     return AlertDialog(
       title: const Text('SignOut'),
