@@ -1,5 +1,8 @@
+//login exception
 class InvaliCredentialAuthException implements Exception {}
+class UserNotFoundAuthException implements Exception {}
 
+//register exception
 class EmailExistAuthException implements Exception {}
 
 class WeakPasswordAuthException implements Exception {}

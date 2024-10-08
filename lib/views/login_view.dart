@@ -1,10 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mynotes/services/auth/auth_exception.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:mynotes/constants/route.dart';
-import 'dart:developer' as devtools show log;
+// import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -61,33 +63,26 @@ class _LoginViewstate extends State<LoginView> {
                 final email = _email.text;
                 final password = _password.text;
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  await AuthService.firebase().logIn(
                     email: email,
                     password: password,
                   );
-                  final user = FirebaseAuth.instance.currentUser;
-                  if(user?.emailVerified ?? false){
+                  final user = AuthService.firebase().currentUser;
+                  if(user?.isEmailVerified ?? false){
                     Navigator.of(context)
                       .pushNamedAndRemoveUntil(notesRoute, (route) => false);
                   }else{
                     Navigator.of(context)
                       .pushNamedAndRemoveUntil(verifyRoute, (route) => false);
                   }
-                  // ignore: use_build_context_synchronously
-                } on FirebaseAuthException catch (e) {
-                  devtools.log(e.code);
-                  switch (e.code) {
-                    case 'invalid-credential':
-                      await ShowErrorDialog(
-                          context, 'user not exist or invalid credential');
-                    case 'wrong-password':
-                      await ShowErrorDialog(context, 'wrong password');
-                    default:
-                      await ShowErrorDialog(context, 'something went wrong');
-                  }
-                } catch(e){
-                        await ShowErrorDialog(context, e.toString());
-                      }
+                  // ignore: use_build_context_synchronousl
+                } on InvaliCredentialAuthException {
+                  await ShowErrorDialog(
+                          context, 'invalid credential or user not found');
+                } on GenericAuthException {
+                  await ShowErrorDialog(context, 'something went wrong');
+                }
+                  
               },
               child: const Text('sign in')),
           TextButton(

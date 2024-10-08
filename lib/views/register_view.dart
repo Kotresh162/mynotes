@@ -1,8 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mynotes/constants/route.dart';
+import 'package:mynotes/services/auth/auth_exception.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
@@ -59,28 +58,17 @@ class _RegisterViewState extends State<RegisterView> {
                       final password = _password.text;
                       
                       try {
-                        await FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
+                        await AuthService.firebase().creatUser(
                         email: email,
                         password: password,
                       );
-                      final user = FirebaseAuth.instance.currentUser;
-                      user?.sendEmailVerification();
+                      AuthService.firebase().sendEmailVerification();
                       Navigator.of(context).pushNamed(verifyRoute);
-                      } on FirebaseAuthException catch (e) {
-                        if(e.code == 'weak-password'){
-                          await ShowErrorDialog(context, 'provide strong password');
-                        }
-                        else if(e.code == 'email-already-in-use'){
-                          await ShowErrorDialog(context, 'email is already used');
-                        }
-                        else if(e.code == 'invalid-email'){
-                          await ShowErrorDialog(context, 'invalid email');
-                        }
-                        else{
-                          await ShowErrorDialog(context, 'error:${e.code}');
-                        }
-                      } catch(e){
+                      } on WeakPasswordAuthException {
+                        await ShowErrorDialog(context, 'provide strong password');
+                      } on EmailExistAuthException {
+                        await ShowErrorDialog(context, 'email is already used');
+                      }  on GenericAuthException catch(e) {
                         await ShowErrorDialog(context, e.toString());
                       }
                     },
