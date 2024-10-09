@@ -1,0 +1,10 @@
+class DatabaseAlreadyOpenException implements Exception {}
+class UnabletoGetDocumentsAuthException implements Exception {}
+class DatabaseNotOpen implements Exception {}
+class CouldNotDeletUser implements Exception {}
+class UserAlreadyExist implements Exception {}
+class UserDoesNotExist implements Exception {}
+class CouldNotFoundUser implements Exception {}
+class CouldNotFoundNote implements Exception {}
+class  CouldNotDeletNote implements Exception {}
+class CouldNotUpdateNote implements Exception {}
